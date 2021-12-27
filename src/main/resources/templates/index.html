@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="yandex-verification" content="9b2a2ec86e88fdb9" />
+    <title>Загрузка mp3 файлов со страницы</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <link th:href="@{/css.css}" rel="stylesheet"/>
+</head>
+<body>
+<style>
+
+
+</style>
+<h3 style="text-align:center; color:red;  animation: anime infinite 20s ease-in-out; position:absolute; top:10px; z-index: 1000"> Скачайте&nbsp;все&nbsp;mp3&nbsp;файлы&nbsp;с&nbsp;любой&nbsp;страницы</h3>
+<div id="form">
+
+    <div class="fish" id="fish"></div>
+    <div class="fish" id="fish2"></div>
+    <div style="margin-top:100px">
+        <?php if(!isset($_GET['id']) && !isset($_POST['link'])): ?>
+        <form id="waterform" method="post" target="index.html">
+
+            <div class="formgroup" id="name-form">
+                <label for="link">Введите адрес откуда надо скачать файлы </label>
+                <input type="url" id="link" name="link" placeholder="https://site.com" required  />
+            </div>
+
+            <div class="formgroup" id="email-form">
+                <label for="email" >Введите свой адрес электронной почты</label>
+                <input type="email" id="email" placeholder="myname@mail.ru" name="email" required />
+            </div>
+
+            <input type="submit" value="Получить архив с файлами на почту" />
+        </form>
+        <h3 id="warn">Ваш запрос поступил в обработку. <br/>Результат будет отправлен на указанный адрес электронной почты.<br/><br/> <button onclick="location.reload()">Ясно. Понятно.</button></h3>
+        <?php if(isset($_GET['resp'])){echo '<div style="position:fixed; background-color: #98d4f3; top:0; left:0; right:0; bottom:0; padding-top:200px"><h3 style="text-align:center">Ваша ссылка просрочена.<br/><br/> <button onclick="location.replace('."'".'index.html'."'".')">Ясно. Понятно.</button></h3></div>'; } ?>
+    <script>
+        $("#waterform").submit(function(event){
+            event.preventDefault();
+            if(!/^(ftp|http|https):\/\/[^ "]+$/.test($('#link').val())){
+                alert('Вы ввели некорректную ссылку');
+                return;
+            }
+            $('#waterform').slideUp('slow');
+            $('#warn').slideDown('slow');
+            var $form = $(this);
+            var serializedData = $form.serialize();
+            request = $.ajax({
+                url: "index.html",
+                type: "post",
+                data: serializedData
+            });
+            request.done(function (response, textStatus, jqXHR){
+                alert('Ваш архив готов. Проверьте почту.');
+            });
+            request.fail(function (jqXHR, textStatus, errorThrown){
+                alert('Что-то не так');
+            });
+
+        });
+
+    </script>
+
+</div>
+<div style='position:fixed; bottom:5px; left:50px' ><a href="https://yadi.sk/d/Ro0b80EvrcMOkQ">Скачать программу для компьютера</a></div>
+</div>
+
+</body>
+
+</html>
