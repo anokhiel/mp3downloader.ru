@@ -34,8 +34,7 @@
             <input type="submit" value="Получить архив с файлами на почту" />
         </form>
         <h3 id="warn">Ваш запрос поступил в обработку. <br/>Результат будет отправлен на указанный адрес электронной почты.<br/><br/> <button onclick="location.reload()">Ясно. Понятно.</button></h3>
-        <?php if(isset($_GET['resp'])){echo '<div style="position:fixed; background-color: #98d4f3; top:0; left:0; right:0; bottom:0; padding-top:200px"><h3 style="text-align:center">Ваша ссылка просрочена.<br/><br/> <button onclick="location.replace('."'".'index.html'."'".')">Ясно. Понятно.</button></h3></div>'; } ?>
-    <script>
+        <script>
         $("#waterform").submit(function(event){
             event.preventDefault();
             if(!/^(ftp|http|https):\/\/[^ "]+$/.test($('#link').val())){
@@ -47,12 +46,12 @@
             var $form = $(this);
             var serializedData = $form.serialize();
             request = $.ajax({
-                url: "index.html",
+                url: "/",
                 type: "post",
                 data: serializedData
             });
             request.done(function (response, textStatus, jqXHR){
-                alert('Ваш архив готов. Проверьте почту.');
+                alert(response);
             });
             request.fail(function (jqXHR, textStatus, errorThrown){
                 alert('Что-то не так');
