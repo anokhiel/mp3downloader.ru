@@ -1,66 +1,98 @@
 package ru.mp3downloader.services;
 
-import org.apache.commons.io.FileUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.mp3downloader.model.LinkOrder;
+import ru.mp3downloader.dto.MainLinkOrder;
 import ru.mp3downloader.utils.Utils;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.zip.ZipOutputStream;
 
 @Service
-public class Downloader {
-    @Autowired
-    private Utils utils;
+@AllArgsConstructor
+@NoArgsConstructor
+public class Downloader  implements Runnable {
+    LinkOrder linkOrder;
 
-    public  HashMap<String, String> getPage(String urls) throws IOException{// Получили список имя файлассылка
-        HashMap<String, String> output = new HashMap<>();
-        Document htmldoc = Jsoup.connect(urls).userAgent("Mozilla").get();
-        Elements elements=htmldoc.getElementsByTag("a");// Получаем все ссылки
-        for(Element element: elements) {
-            String link=element.absUrl("href");
-            if(link.indexOf(".mp3")!=-1) {// Оставляем только mp3
-                String text=element.text();// Получаем название будущего файла по тексту в ссылке
-                if(text.isEmpty()||text.equals(link)) {//Если названия нет или совпадает со ссылкой, оставляем название файла как в ссылке
-                    text=link.substring(link.lastIndexOf("/"));
-                }
-                text=utils.fileSafeName(text);// Убираем недопустимые символы
-                if(output.containsKey(text)) {// Если имя файла уже есть
-                    int i=1;
-                    while(output.containsKey(text)) {// Добавляем порядковый номер в конце файла
-                        if(i==1) {
-                            text=text+" "+Integer.toString(i); // Для первого случая приписываем в конце 1
-                        }else {
-                            int j=i-1;
-                            text=text.replace(Integer.toString(j),Integer.toString(i) ); // Если файлов с этим именем больше одного, в последнем файле заменяем на следующий номер
-                        }
-                        i++;
-                    }
-                }
-
-                // Получаем абсолютную ссылку
-                output.put(text, link); // Добавляем в конец
-
-            }
+    @PostConstruct
+    private void init() {
+        try {
+            Files.createDirectories(Paths.get("output"));
+            Files.createDirectories(Paths.get("downloads"));
+        }catch (IOException e){
+            e.printStackTrace();
         }
-        return output;
+        }
+
+    @Override
+    public void run() {
+        try {
+            linkOrder=MainLinkOrder.mainLinkOrder;
+            boolean done = executor(linkOrder);
+            if (done) {
+                informMainServer(linkOrder, "OK");
+                System.out.print("OK");
+            } else {
+                informMainServer(linkOrder, "NOFILESFOUND");
+                System.out.print("NOFILESFOUND");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private boolean executor(LinkOrder linkOrder) throws IOException, InterruptedException {
+        String link = linkOrder.getLink();// Получаем ввод пользователя
+        if (!link.matches("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")) {
+            return false;// Не ссылка
+        }
+        HashMap<String, String> linkList = Utils.getPage(link);// Получаем список "имя файла"->"ссылка"
+        if (!linkList.isEmpty()) {// Если список не пустой
+            FileOutputStream fos = new FileOutputStream(Utils.getArchive(linkOrder));
+            ZipOutputStream zipOut = new ZipOutputStream(fos);
+            for (HashMap.Entry<String, String> element : linkList.entrySet()) {
+                //	System.out.println(element.getKey()+" "+element.getValue());
+                String downloadedFile = linkOrder.getFolder() + "/" + element.getKey() + ".mp3";
+                Utils.downloadaFile(element.getValue(), downloadedFile);// Загружаем файл
+                File fileToZip = new File(downloadedFile);
+                if (fileToZip.isFile()) {
+                    Utils.zipFile(fileToZip, zipOut);
+                    fileToZip.delete();
+                }
+            }
+            zipOut.close();
+            fos.close();
+            return true;// Загрузили нормально
+        }
+        return false;
     }
 
 
+    private void informMainServer(LinkOrder srs, String status) throws IOException{
+//        String url = mainhost+"?id="+srs.getLid()+"&status="+status+"&secret="+secret;
+//        URL obj = new URL(url);
+//        HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+//
+//        connection.setRequestMethod("GET");
+//
+//        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+//        String inputLine;
+//        StringBuffer response = new StringBuffer();
+//
+//        while ((inputLine = in.readLine()) != null) {
+//            response.append(inputLine);
+//        }
+//        in.close();
+//
+//        System.out.println(response.toString());
 
-    private void downloadaFile(String link, String fname) {//Загрузка фала
-        try {
-            FileUtils.copyURLToFile(new URL(link),
-                    new File(fname));
-
-        } catch (IOException e) {
-            //     e.printStackTrace();
-        }
     }
 }

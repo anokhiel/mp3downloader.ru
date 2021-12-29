@@ -1,4 +1,4 @@
-package ru.mp3downloader;
+package ru.mp3downloader.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -2,6 +2,7 @@ package ru.mp3downloader.model;
 
 
 import lombok.*;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
 import java.nio.file.Path;
@@ -11,6 +12,8 @@ import java.time.LocalDateTime;
 @Entity
 @Setter
 @Getter
+@ToString
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class LinkOrder {
@@ -31,8 +34,7 @@ public class LinkOrder {
     @Column
     private LocalDateTime downloaded;
 
-    @Column
-    private String file;
-
+    @Transient
+    private String folder="downloads";
 
 }
