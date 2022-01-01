@@ -1,0 +1,23 @@
+spring.datasource.url=jdbc:postgresql://localhost:5432/database
+spring.datasource.username=username
+spring.datasource.password=password
+
+spring.jpa.show-sql = true
+spring.jpa.hibernate.ddl-auto = create
+
+
+spring.jpa.defer-datasource-initialization=true
+spring.sql.init.mode=always
+
+
+
+email.sender.host=smtp.yandex.ru
+email.sender.port=587
+email.sender.username=username
+email.sender.password=password
+email.transport.protocol=smtp
+email.smtp.auth=true
+email.smtp.starttls.enable=true
+
+email.debug=true
+email.from.address=mail@address.ru

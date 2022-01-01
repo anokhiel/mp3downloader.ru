@@ -20,7 +20,7 @@ public class EmailServiceImpl {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    @Value("mail@mp3downloader.ru")
+    @Value("${email.sender.username}")
     private String fromAddress;
 
     public void sendMailMultipart(String toEmail, String subject, String message, File file) throws MessagingException {

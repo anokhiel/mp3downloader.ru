@@ -1,6 +1,7 @@
 package ru.mp3downloader.utils;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -10,15 +11,18 @@ import ru.mp3downloader.model.LinkOrder;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-
+@Slf4j
 public class Utils {
     public static String  fileSafeName(String text) {// Убираем недопустимые символы в имени файла
         text = text.trim();
@@ -46,12 +50,8 @@ public class Utils {
 
 
     }
-    public static void delete(String fname) {
-        File f=new File(fname);
-        f.delete();
 
-    }
-    public static HashMap<String, String> getPage(String urls) throws IOException{// Получили список имя файлассылка
+    public static Map<String, String> getPage(String urls) throws IOException{// Получили список имя файлассылка
         HashMap<String, String> output = new HashMap<>();
         Document htmldoc = Jsoup.connect(urls).userAgent("Mozilla").get();
         Elements elements=htmldoc.getElementsByTag("a");// Получаем все ссылки
@@ -95,6 +95,22 @@ public class Utils {
 
     public static String getArchive(LinkOrder linkOrder){
         return "output/"+linkOrder.getId().toString()+".zip";
+    }
+    public static void createArchive(LinkOrder linkOrder, Map<String,String> linkList) throws IOException {
+        FileOutputStream fos = new FileOutputStream(Utils.getArchive(linkOrder));
+        ZipOutputStream zipOut = new ZipOutputStream(fos,  java.nio.charset.StandardCharsets.UTF_8);
+        for (HashMap.Entry<String, String> element : linkList.entrySet()) {
+            log.info(element.getKey()+" "+element.getValue());
+            String downloadedFile = linkOrder.getFolder() + "/" + element.getKey() + ".mp3";
+            Utils.downloadaFile(element.getValue(), downloadedFile);// Загружаем файл
+            File fileToZip = new File(downloadedFile);
+            if (fileToZip.isFile()) {
+                Utils.zipFile(fileToZip, zipOut);
+                fileToZip.delete();
+            }
+        }
+        zipOut.close();
+        fos.close();
     }
 
 }

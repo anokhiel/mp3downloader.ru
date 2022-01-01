@@ -2,67 +2,88 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="yandex-verification" content="9b2a2ec86e88fdb9" />
+    <meta name="yandex-verification" content="9b2a2ec86e88fdb9"/>
     <title>Загрузка mp3 файлов со страницы</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <link th:href="@{/css.css}" rel="stylesheet"/>
+    <meta th:name="_csrf" th:content="${_csrf.token}"/>
+    <meta th:name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
+
 <body>
-<style>
-
-
-</style>
-<h3 style="text-align:center; color:red;  animation: anime infinite 20s ease-in-out; position:absolute; top:10px; z-index: 1000"> Скачайте&nbsp;все&nbsp;mp3&nbsp;файлы&nbsp;с&nbsp;любой&nbsp;страницы</h3>
+<h3 style="text-align:center; color:red;  animation: anime infinite 20s ease-in-out; position:absolute; top:10px; z-index: 1000">
+    Скачайте&nbsp;все&nbsp;mp3&nbsp;файлы&nbsp;с&nbsp;любой&nbsp;страницы</h3>
+<input type="hidden" id="errorcheck" th:value="${error}">
 <div id="form">
 
     <div class="fish" id="fish"></div>
     <div class="fish" id="fish2"></div>
     <div style="margin-top:100px">
-        <?php if(!isset($_GET['id']) && !isset($_POST['link'])): ?>
-        <form id="waterform" method="post" target="index.html">
+        <form th:action="@{/}" id="waterform" method="post" target="index.html">
 
             <div class="formgroup" id="name-form">
                 <label for="link">Введите адрес откуда надо скачать файлы </label>
-                <input type="url" id="link" name="link" placeholder="https://site.com" required  />
+                <input type="url" id="link" name="link" placeholder="https://site.com" required/>
             </div>
 
             <div class="formgroup" id="email-form">
-                <label for="email" >Введите свой адрес электронной почты</label>
-                <input type="email" id="email" placeholder="myname@mail.ru" name="email" required />
+                <label for="email">Введите свой адрес электронной почты</label>
+                <input type="email" id="email" placeholder="myname@mail.ru" name="email" required/>
             </div>
 
-            <input type="submit" value="Получить архив с файлами на почту" />
+            <input type="submit" value="Получить архив с файлами на почту"/>
         </form>
-        <h3 id="warn">Ваш запрос поступил в обработку. <br/>Результат будет отправлен на указанный адрес электронной почты.<br/><br/> <button onclick="location.reload()">Ясно. Понятно.</button></h3>
+        <h3 id="warn">Ждите...</h3>
         <script>
-        $("#waterform").submit(function(event){
-            event.preventDefault();
-            if(!/^(ftp|http|https):\/\/[^ "]+$/.test($('#link').val())){
-                alert('Вы ввели некорректную ссылку');
-                return;
-            }
-            $('#waterform').slideUp('slow');
-            $('#warn').slideDown('slow');
-            var $form = $(this);
-            var serializedData = $form.serialize();
-            request = $.ajax({
-                url: "/",
-                type: "post",
-                data: serializedData
+            $(document).ready(function () {
+                var er = $('#errorcheck').val();
+                if (er) {
+                    var text = '';
+                    switch (er) {
+                        case 'ArchiveNotFound':
+                        case 'WrongLink':
+                            text = 'Ваша ссылка просрочена или не верна! Попропуйте повторить попытку!';
+                            break;
+                        default:
+                            text = 'Что-то пошло не так. Попробуйте еще раз!';
+                    }
+                    $('#waterform').slideUp('slow');
+                    $('#warn').slideDown('slow');
+                    $('#warn').html('<h2>' + text + '<h2></h2><button onclick="location.replace(' + "'/'" + ')">Ясно. Понятно.</button>')
+                }
             });
-            request.done(function (response, textStatus, jqXHR){
-                alert(response);
-            });
-            request.fail(function (jqXHR, textStatus, errorThrown){
-                alert('Что-то не так');
+            $("#waterform").submit(function (event) {
+                event.preventDefault();
+                if (!/^(ftp|http|https):\/\/[^ "]+$/.test($('#link').val())) {
+                    alert('Вы ввели некорректную ссылку');
+                    return;
+                }
+                var $form = $(this);
+                var serializedData = $form.serialize();
+                var token = $("meta[name='_csrf']").attr("content");
+                var header = $("meta[name='_csrf_header']").attr("content");
+                $('#waterform').slideUp('slow');
+                $('#warn').slideDown('slow');
+                request = $.ajax({
+                    url: "/",
+                    type: "post",
+                    data: serializedData
+                });
+                request.headers = {"Authorization": localStorage.getItem(token)};
+                request.done(function (response, textStatus, jqXHR) {
+                    $('#warn').html(response + '<button onclick="location.reload()">Ясно. Понятно.</button>');
+                });
+                request.fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Что-то не так');
+                });
+
             });
 
-        });
+        </script>
 
-    </script>
-
-</div>
-<div style='position:fixed; bottom:5px; left:50px' ><a href="https://yadi.sk/d/Ro0b80EvrcMOkQ">Скачать программу для компьютера</a></div>
+    </div>
+    <div style='position:fixed; bottom:5px; left:50px'><a href="https://yadi.sk/d/Ro0b80EvrcMOkQ">Скачать программу для
+        компьютера</a></div>
 </div>
 
 </body>
