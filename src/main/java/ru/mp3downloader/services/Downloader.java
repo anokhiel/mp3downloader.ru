@@ -58,6 +58,7 @@ public class Downloader {
 
 
     private boolean executor(LinkOrder linkOrder) throws IOException {
+        if(Utils.fileExists(linkOrder)){return true;}
         Map<String, String> linkList = Utils.getPage(linkOrder.getLink());// Получаем список "имя файла"->"ссылка"
         if (!linkList.isEmpty()) {// Если список не пустой
             Utils.createArchive(linkOrder, linkList);
@@ -74,13 +75,14 @@ public class Downloader {
                     status.getSubject(),
                     status.getText()
                             .replaceAll("%link%", linkOrder.getLink())
-                            .replaceAll("%key%", linkOrder.getId().toString() + "_" + linkOrder.getOrdered().hashCode())
+                            .replaceAll("%key%", linkOrder.getFile())
             );
-            log.info("Email sent to email" + linkOrder.getEmail() + ", subject: " +
+            log.info("Email sent to email " + linkOrder.getEmail() + ", subject: " +
                     status.getSubject() + " text: " +
                     status.getText()
                             .replaceAll("%link%", linkOrder.getLink())
-                            .replaceAll("%key%", linkOrder.getId().toString() + "_" + linkOrder.getOrdered().hashCode()));
+                            .replaceAll("%key%", linkOrder.getFile())
+            );
         } catch (Exception e) {
 
             e.printStackTrace();

@@ -29,12 +29,16 @@ public class LinkOrder {
     private String email;
 
     @Column
-    private LocalDateTime ordered;
+    private LocalDateTime ordered; // Дата заказа
 
     @Column
-    private LocalDateTime downloaded;
+    private LocalDateTime downloaded; // Дата загрузки
+
+    @Column(unique = true)
+    private String file; // Название файла
 
     @Transient
     private String folder="downloads";
+
 
 }

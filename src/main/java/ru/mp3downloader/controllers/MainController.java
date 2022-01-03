@@ -46,40 +46,37 @@ public class MainController {
     @PostMapping("/")
     @ResponseBody
     public String order(@ModelAttribute LinkOrder linkOrder) {
-        if (!linkOrder.getLink().matches("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")) {
+        String link=linkOrder.getLink();
+        if (!link.matches("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")) {
             return "Вы ввели некорректную ссылку";// Не ссылка
         }
         linkOrder.setOrdered(LocalDateTime.now());
+        linkOrder.setFile(String.valueOf(link.hashCode()).substring(1));
         linkOrderService.addOrder(linkOrder);
         downloader.process(linkOrder);
         return "Ваш запрос поступил в обработку. <br/>Результат будет отправлен на указанный адрес электронной почты.<br/><br/>";
     }
 
-    @GetMapping("/getmyfiles/{key}")
-    public ResponseEntity getMyFiles(@PathVariable String key) {
-        String[] data = key.split("_");
-        log.info("Download started for " + data[0]+".zip");
+    @GetMapping("/getmyfiles/{file}")
+    public ResponseEntity getMyFiles(@PathVariable String file) {
+        log.info("Download started for " + file+".zip");
         HttpHeaders headers = new HttpHeaders();
         try {
-            LinkOrder linkOrder = linkOrderService.findOrderById(Long.parseLong(data[0])).orElseThrow(() -> new WrongLinkException() );
-            if (data[1] == null | !data[1].equals(linkOrder.getOrdered().hashCode())) {
-                              throw new WrongLinkException();
-            }
-            File archive = new File("output/" + data[0] + ".zip");
+            LinkOrder linkOrder = linkOrderService.findLinkOrderByFile(file).orElseThrow(() -> new WrongLinkException() );
+            File archive = new File("output/" + file + ".zip");
             if (!archive.exists()) {
                 throw new ArchiveNotFound();
             }
             linkOrder.setDownloaded(LocalDateTime.now());
             linkOrderService.updateOrder(linkOrder);
-            log.info("Download "+key+" started");
+            log.info("Download "+ file +" started");
             headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
             headers.add("Content-Type", "application/zip");
             headers.add("Pragma", "no-cache");
             headers.add("Content-Transfer-Encoding", "binary");
             headers.add("Expires", "0");
-            headers.add("Content-Disposition", "attachment;filename=" + data[0] + ".zip");
+            headers.add("Content-Disposition", "attachment;filename=" + file + ".zip");
             InputStreamResource resource = new InputStreamResource(new FileInputStream(archive));
-
             return ResponseEntity.ok()
                     .headers(headers)
                     .contentLength(archive.length())

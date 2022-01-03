@@ -14,10 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -47,10 +44,10 @@ public class Utils {
             zipOut.write(bytes, 0, length);
         }
         fis.close();
-
-
     }
-
+    public static boolean fileExists(LinkOrder linkOrder){
+        return new File(Utils.getArchive(linkOrder)).exists();
+    }
     public static Map<String, String> getPage(String urls) throws IOException{// Получили список имя файлассылка
         HashMap<String, String> output = new HashMap<>();
         Document htmldoc = Jsoup.connect(urls).userAgent("Mozilla").get();
@@ -83,7 +80,7 @@ public class Utils {
         }
         return output;
     }
-    public static void downloadaFile(String link, String fname) {//Загрузка фала
+    public static void downloadFile(String link, String fname) {//Загрузка фала
         try {
             FileUtils.copyURLToFile(new URL(link),
                     new File(fname));
@@ -93,16 +90,15 @@ public class Utils {
         }
     }
 
-    public static String getArchive(LinkOrder linkOrder){
-        return "output/"+linkOrder.getId().toString()+".zip";
-    }
+    public static String getArchive(LinkOrder linkOrder){ return "output/"+linkOrder.getFile()+".zip"; }
+
     public static void createArchive(LinkOrder linkOrder, Map<String,String> linkList) throws IOException {
         FileOutputStream fos = new FileOutputStream(Utils.getArchive(linkOrder));
         ZipOutputStream zipOut = new ZipOutputStream(fos,  java.nio.charset.StandardCharsets.UTF_8);
         for (HashMap.Entry<String, String> element : linkList.entrySet()) {
             log.info(element.getKey()+" "+element.getValue());
             String downloadedFile = linkOrder.getFolder() + "/" + element.getKey() + ".mp3";
-            Utils.downloadaFile(element.getValue(), downloadedFile);// Загружаем файл
+            Utils.downloadFile(element.getValue(), downloadedFile);// Загружаем файл
             File fileToZip = new File(downloadedFile);
             if (fileToZip.isFile()) {
                 Utils.zipFile(fileToZip, zipOut);

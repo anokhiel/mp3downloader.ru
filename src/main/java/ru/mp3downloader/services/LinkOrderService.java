@@ -9,4 +9,5 @@ public interface LinkOrderService {
     public LinkOrder updateOrder(LinkOrder order);
     public void deleteOrder(Long id);
     public Optional<LinkOrder> findOrderById(Long id);
+    public Optional<LinkOrder> findLinkOrderByFile(String file);
 }

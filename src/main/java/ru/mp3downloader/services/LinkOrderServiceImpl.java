@@ -38,4 +38,7 @@ class LinkOrderServiceImpl implements  LinkOrderService {
     public Optional<LinkOrder> findOrderById(Long id) {
         return linkOrderRepository.findById(id);
     }
+    public Optional<LinkOrder> findLinkOrderByFile(String file){
+        return  linkOrderRepository.findLinkOrderByFile(file);
+    }
 }
