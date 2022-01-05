@@ -1,4 +1,7 @@
 ## Application for downloading mp3 files from pages with direct links.
 It looks for all links on the page, then downloads the files renaming them as they are named on the page, and then sends the 
-link to the archive with the files to the requested email.
+link to the archive with the files to the requested email. 
+The link is active for an hour.
+Then the downloaded archives are deleted by the cron job.
+
 The working instance is deployed to the address [https://mp3downloader.ru](http://mp3downloader.ru "https://mp3downloader.ru").
