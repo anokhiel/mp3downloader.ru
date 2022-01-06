@@ -99,18 +99,4 @@ public class MainController {
         return "index";
     }
 
-    @GetMapping("/sendTest")
-    public String sentTest() {
-        try {
-
-            //  emailService.sendMail("alexandpopov@yandex.ru", "test", "test");
-            return "index";
-        } catch (Exception e) {
-            return "error";
-        }
-
-
-    }
-
-
 }
