@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class LinkOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

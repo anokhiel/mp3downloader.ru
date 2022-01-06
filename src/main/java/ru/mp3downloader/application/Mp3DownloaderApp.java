@@ -11,8 +11,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan("ru.mp3downloader.*")
 @EnableJpaRepositories("ru.mp3downloader.repository")
 
-public class Mp3downloaderapp {
+public class Mp3DownloaderApp {
     public static void main(String[] args) {
-        SpringApplication.run(Mp3downloaderapp.class, args);
+        SpringApplication.run(Mp3DownloaderApp.class, args);
     }
 }

@@ -21,7 +21,7 @@ import java.util.zip.ZipOutputStream;
 
 @Slf4j
 public class Utils {
-    public static String  fileSafeName(String text) {// Убираем недопустимые символы в имени файла
+    public static String fileSafeName(String text) {// Убираем недопустимые символы в имени файла
         text = text.trim();
         text = text.replaceAll("\"", "");
         text = text.replaceAll("<", "");
@@ -34,40 +34,43 @@ public class Utils {
         text = text.replaceAll("\\*", "");
         return text;
     }
+
     public static void zipFile(File fileToZip, ZipOutputStream zipOut) throws IOException {
         FileInputStream fis = new FileInputStream(fileToZip);
         ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
         zipOut.putNextEntry(zipEntry);
         byte[] bytes = new byte[1024];
         int length;
-        while((length = fis.read(bytes)) >= 0) {
+        while ((length = fis.read(bytes)) >= 0) {
             zipOut.write(bytes, 0, length);
         }
         fis.close();
     }
-    public static boolean fileExists(LinkOrder linkOrder){
+
+    public static boolean fileExists(LinkOrder linkOrder) {
         return new File(Utils.getArchive(linkOrder)).exists();
     }
-    public static Map<String, String> getPage(String urls) throws IOException{// Получили список имя файлассылка
+
+    public static Map<String, String> getPage(String urls) throws IOException {// Получили список имя файла-ссылка
         HashMap<String, String> output = new HashMap<>();
         Document htmldoc = Jsoup.connect(urls).userAgent("Mozilla").get();
-        Elements elements=htmldoc.getElementsByTag("a");// Получаем все ссылки
-        for(Element element: elements) {
-            String link=element.absUrl("href");
-            if(link.indexOf(".mp3")!=-1) {// Оставляем только mp3
-                String text=element.text();// Получаем название будущего файла по тексту в ссылке
-                if(text.isEmpty()||text.equals(link)) {//Если названия нет или совпадает со ссылкой, оставляем название файла как в ссылке
-                    text=link.substring(link.lastIndexOf("/"));
+        Elements elements = htmldoc.getElementsByTag("a");// Получаем все ссылки
+        for (Element element : elements) {
+            String link = element.absUrl("href");
+            if (link.indexOf(".mp3") != -1) {// Оставляем только mp3
+                String text = element.text();// Получаем название будущего файла по тексту в ссылке
+                if (text.isEmpty() || text.equals(link)) {//Если названия нет или совпадает со ссылкой, оставляем название файла как в ссылке
+                    text = link.substring(link.lastIndexOf("/"));
                 }
-                text=Utils.fileSafeName(text);// Убираем недопустимые символы
-                if(output.containsKey(text)) {// Если имя файла уже есть
-                    int i=1;
-                    while(output.containsKey(text)) {// Добавляем порядковый номер в конце файла
-                        if(i==1) {
-                            text=text+" "+Integer.toString(i); // Для первого случая приписываем в конце 1
-                        }else {
-                            int j=i-1;
-                            text=text.replace(Integer.toString(j),Integer.toString(i) ); // Если файлов с этим именем больше одного, в последнем файле заменяем на следующий номер
+                text = Utils.fileSafeName(text);// Убираем недопустимые символы
+                if (output.containsKey(text)) {// Если имя файла уже есть
+                    int i = 1;
+                    while (output.containsKey(text)) {// Добавляем порядковый номер в конце файла
+                        if (i == 1) {
+                            text = text + " " + Integer.toString(i); // Для первого случая приписываем в конце 1
+                        } else {
+                            int j = i - 1;
+                            text = text.replace(Integer.toString(j), Integer.toString(i)); // Если файлов с этим именем больше одного, в последнем файле заменяем на следующий номер
                         }
                         i++;
                     }
@@ -80,23 +83,30 @@ public class Utils {
         }
         return output;
     }
+
     public static void downloadFile(String link, String fname) {//Загрузка фала
         try {
+            File result;
             FileUtils.copyURLToFile(new URL(link),
-                    new File(fname));
-
+                    result = new File(fname));
+            if (result.length() == 0) {
+                result.delete();
+            }
         } catch (IOException e) {
-            //     e.printStackTrace();
+            log.info("Ошибка загрузки файла " + fname);
+            e.printStackTrace();
         }
     }
 
-    public static String getArchive(LinkOrder linkOrder){ return "output/"+linkOrder.getFile()+".zip"; }
+    public static String getArchive(LinkOrder linkOrder) {
+        return "output/" + linkOrder.getFile() + ".zip";
+    }
 
-    public static void createArchive(LinkOrder linkOrder, Map<String,String> linkList) throws IOException {
+    public static void createArchive(LinkOrder linkOrder, Map<String, String> linkList) throws IOException {
         FileOutputStream fos = new FileOutputStream(Utils.getArchive(linkOrder));
-        ZipOutputStream zipOut = new ZipOutputStream(fos,  java.nio.charset.StandardCharsets.UTF_8);
+        ZipOutputStream zipOut = new ZipOutputStream(fos, java.nio.charset.StandardCharsets.UTF_8);
         for (HashMap.Entry<String, String> element : linkList.entrySet()) {
-            log.info(element.getKey()+" "+element.getValue());
+            log.info(element.getKey() + " " + element.getValue());
             String downloadedFile = linkOrder.getFolder() + "/" + element.getKey() + ".mp3";
             Utils.downloadFile(element.getValue(), downloadedFile);// Загружаем файл
             File fileToZip = new File(downloadedFile);
