@@ -14,28 +14,10 @@ class LinkOrderServiceImpl implements  LinkOrderService {
 
 
     @Override
-    public LinkOrder addOrder(LinkOrder order) {
+    public LinkOrder addOrUpdate(LinkOrder order) {
             linkOrderRepository.save(order);
             return order;
          }
-
-    @Override
-    public LinkOrder updateOrder(LinkOrder order) {
-
-        linkOrderRepository.save(order);
-        return order;
-    }
-
-
-    @Override
-    public void deleteOrder(Long id) {
-        linkOrderRepository.deleteById(id);
-         }
-
-    @Override
-    public Optional<LinkOrder> findOrderById(Long id) {
-        return linkOrderRepository.findById(id);
-    }
 
     @Override
     public Optional<LinkOrder> findOrderByOrderNumber(Long orderNumber){

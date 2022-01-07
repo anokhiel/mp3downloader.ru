@@ -51,10 +51,12 @@ public class MainController {
         if (!link.matches("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")) {
             return "Вы ввели некорректную ссылку";// Не ссылка
         }
+        Long orderNumber=(long)(link+linkOrder.getEmail()).hashCode();
+        linkOrder=linkOrderService.findOrderByOrderNumber(orderNumber).orElse(linkOrder);
         linkOrder.setOrdered(LocalDateTime.now());
         linkOrder.setFile(String.valueOf(link.hashCode()).substring(1));
-        linkOrder.setOrderNumber((long)(link+linkOrder.getEmail()).hashCode());
-        linkOrderService.addOrder(linkOrder);
+        linkOrder.setOrderNumber(orderNumber);
+        linkOrderService.addOrUpdate(linkOrder);
         downloader.process(linkOrder);
         return "Ваш запрос поступил в обработку. <br/>Результат будет отправлен на указанный адрес электронной почты.<br/><br/>";
     }
@@ -70,7 +72,7 @@ public class MainController {
                 throw new ArchiveNotFound();
             }
             linkOrder.setDownloaded(LocalDateTime.now());
-            linkOrderService.updateOrder(linkOrder);
+            linkOrderService.addOrUpdate(linkOrder);
             log.info("Download "+ orderNumber +" started");
             headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
             headers.add("Content-Type", "application/zip");
