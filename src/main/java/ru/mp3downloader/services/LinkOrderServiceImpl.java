@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.mp3downloader.model.LinkOrder;
 import ru.mp3downloader.repository.LinkOrderRepository;
-
-import javax.persistence.PersistenceException;
 import java.util.Optional;
 
 @Service
@@ -38,7 +36,10 @@ class LinkOrderServiceImpl implements  LinkOrderService {
     public Optional<LinkOrder> findOrderById(Long id) {
         return linkOrderRepository.findById(id);
     }
-    public Optional<LinkOrder> findLinkOrderByFile(String file){
-        return  linkOrderRepository.findLinkOrderByFile(file);
+
+    @Override
+    public Optional<LinkOrder> findOrderByOrderNumber(Long orderNumber){
+        return  linkOrderRepository.findLinkOrderByOrderNumber(orderNumber);
     }
+
 }

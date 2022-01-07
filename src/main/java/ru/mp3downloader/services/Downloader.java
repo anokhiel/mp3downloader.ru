@@ -29,8 +29,8 @@ public class Downloader {
     @PostConstruct
     private void init() {
         try {
-            Files.createDirectories(Paths.get("output"));
-            Files.createDirectories(Paths.get("downloads"));
+            Files.createDirectories(Paths.get(Utils.output));
+            Files.createDirectories(Paths.get(Utils.downloads));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -58,7 +58,7 @@ public class Downloader {
 
 
     private boolean executor(LinkOrder linkOrder) throws IOException {
-        if(Utils.fileExists(linkOrder)){return true;}
+        if(Utils.fileExists(linkOrder)) return true;
         Map<String, String> linkList = Utils.getPage(linkOrder.getLink());// Получаем список "имя файла"->"ссылка"
         if (!linkList.isEmpty()) {// Если список не пустой
             Utils.createArchive(linkOrder, linkList);
@@ -75,7 +75,7 @@ public class Downloader {
                     status.getSubject(),
                     status.getText()
                             .replaceAll("%link%", linkOrder.getLink())
-                            .replaceAll("%key%", linkOrder.getFile())
+                            .replaceAll("%key%", Long.toString(linkOrder.getOrderNumber()))
             );
             log.info("Email sent to email " + linkOrder.getEmail() + ", subject: " +
                     status.getSubject() + " text: " +

@@ -16,6 +16,7 @@ import ru.mp3downloader.model.LinkOrder;
 import ru.mp3downloader.services.Downloader;
 import ru.mp3downloader.services.EmailServiceImpl;
 import ru.mp3downloader.services.LinkOrderService;
+import ru.mp3downloader.utils.Utils;
 
 import java.io.File;
 
@@ -52,30 +53,31 @@ public class MainController {
         }
         linkOrder.setOrdered(LocalDateTime.now());
         linkOrder.setFile(String.valueOf(link.hashCode()).substring(1));
+        linkOrder.setOrderNumber((long)(link+linkOrder.getEmail()).hashCode());
         linkOrderService.addOrder(linkOrder);
         downloader.process(linkOrder);
         return "Ваш запрос поступил в обработку. <br/>Результат будет отправлен на указанный адрес электронной почты.<br/><br/>";
     }
 
-    @GetMapping("/getmyfiles/{file}")
-    public ResponseEntity getMyFiles(@PathVariable String file) {
-        log.info("Download started for " + file+".zip");
+    @GetMapping("/getmyfiles/{orderNumber}")
+    public ResponseEntity getMyFiles(@PathVariable Long orderNumber) {
+        log.info("Download started for " + orderNumber +".zip");
         HttpHeaders headers = new HttpHeaders();
         try {
-            LinkOrder linkOrder = linkOrderService.findLinkOrderByFile(file).orElseThrow(() -> new WrongLinkException() );
-            File archive = new File("output/" + file + ".zip");
+            LinkOrder linkOrder = linkOrderService.findOrderByOrderNumber(orderNumber).orElseThrow(() -> new WrongLinkException() );
+            File archive = new File(Utils.output+"/" + linkOrder.getFile()+ ".zip");
             if (!archive.exists()) {
                 throw new ArchiveNotFound();
             }
             linkOrder.setDownloaded(LocalDateTime.now());
             linkOrderService.updateOrder(linkOrder);
-            log.info("Download "+ file +" started");
+            log.info("Download "+ orderNumber +" started");
             headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
             headers.add("Content-Type", "application/zip");
             headers.add("Pragma", "no-cache");
             headers.add("Content-Transfer-Encoding", "binary");
             headers.add("Expires", "0");
-            headers.add("Content-Disposition", "attachment;filename=" + file + ".zip");
+            headers.add("Content-Disposition", "attachment;filename=" + orderNumber + ".zip");
             InputStreamResource resource = new InputStreamResource(new FileInputStream(archive));
             return ResponseEntity.ok()
                     .headers(headers)

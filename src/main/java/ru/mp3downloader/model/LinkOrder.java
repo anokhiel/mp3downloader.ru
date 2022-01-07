@@ -35,11 +35,10 @@ public class LinkOrder {
     @Column
     private LocalDateTime downloaded; // Дата загрузки
 
-    @Column(unique = true)
+    @Column
     private String file; // Название файла
 
-    @Transient
-    private String folder="downloads";
-
+    @Column
+    private Long orderNumber;
 
 }
