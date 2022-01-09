@@ -1,5 +1,6 @@
 package ru.mp3downloader.services;
 
+import lombok.EqualsAndHashCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.mp3downloader.model.LinkOrder;
@@ -7,6 +8,7 @@ import ru.mp3downloader.repository.LinkOrderRepository;
 import java.util.Optional;
 
 @Service
+@EqualsAndHashCode
 class LinkOrderServiceImpl implements  LinkOrderService {
 
     @Autowired

@@ -23,10 +23,10 @@ public class LinkOrder {
     private Long id;
 
 
-    @Column
+    @Column(nullable = false)
     private String link; // Ссылка или текст html
 
-    @Column
+    @Column(nullable = false)
     private String email;
 
     @Column
@@ -35,10 +35,10 @@ public class LinkOrder {
     @Column
     private LocalDateTime downloaded; // Дата загрузки
 
-    @Column
+    @Column(nullable = false)
     private String file; // Название файла
 
-    @Column
+    @Column(nullable = false)
     private Long orderNumber;
 
 }

@@ -1,5 +1,6 @@
 package ru.mp3downloader.services;
 
+import org.springframework.stereotype.Service;
 import ru.mp3downloader.model.LinkOrder;
 
 import java.util.Optional;
