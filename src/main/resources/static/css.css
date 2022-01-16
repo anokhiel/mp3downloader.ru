@@ -1,14 +1,15 @@
 @import url(https://fonts.googleapis.com/css?family=Sniglet|Raleway:900);
 
 
-body, html{
+body, html {
     height: 100%;
     padding: 0;
     margin: 0;
     font-family: 'Sniglet', cursive;
     background-color: yellow
 }
-h1{
+
+h1 {
     font-weight: normal;
     font-size: 4em;
     font-family: 'Raleway', sans-serif;
@@ -19,44 +20,56 @@ h1{
     text-align: center;
 
 }
+
 @keyframes anime {
     0% {
         color: orange;
-        font-size:1em;
-        left:5%;
+        font-size: 1em;
+        left: 5%;
     }
     33% {
         color: red;
-        left:40px;
+        left: 40px;
     }
     66% {
         color: blue;
-        font-size:1.5em;
-        left:60%;
+        font-size: 1.5em;
+        left: 60%;
     }
     100% {
         color: orange;
-        font-size:1em;
-        left:5%;
+        font-size: 1em;
+        left: 5%;
     }
 }
+
 /* Animation webkit */
-@-webkit-keyframes myfirst
-{
-    0% {margin-left: -235px}
-    90% {margin-left: 100%;}
-    100% {margin-left: 100%;}
+@-webkit-keyframes myfirst {
+    0% {
+        margin-left: -235px
+    }
+    90% {
+        margin-left: 100%;
+    }
+    100% {
+        margin-left: 100%;
+    }
 }
 
 /* Animation */
-@keyframes myfirst
-{
-    0% {margin-left: -235px}
-    70% {margin-left: 100%;}
-    100% {margin-left: 100%;}
+@keyframes myfirst {
+    0% {
+        margin-left: -235px
+    }
+    70% {
+        margin-left: 100%;
+    }
+    100% {
+        margin-left: 100%;
+    }
 }
 
-.fish{
+.fish {
     background-image: url('/images/fish.png');
     width: 235px;
     height: 104px;
@@ -70,30 +83,31 @@ h1{
     -webkit-animation-timing-function: linear;
 }
 
-#fish{
+#fish {
     top: 120px;
 }
 
-#fish2{
+#fish2 {
     top: 260px;
     animation-delay: 12s;
     -webkit-animation-delay: 12s;
 }
 
 
-header{
+header {
     height: 160px;
     background: url('http://www.geertjanhendriks.nl/codepen/form/golf.png') repeat-x bottom;
 }
 
-#form{
+#form {
     height: 100%;
     background-color: #98d4f3;
     overflow: hidden;
     position: relative;
 
 }
-form{
+
+form {
     margin: 0 auto;
     width: 500px;
     padding-top: 40px;
@@ -102,10 +116,12 @@ form{
 
 
 }
-label, input, textarea{
+
+label, input, textarea {
     display: block;
 }
-input, textarea{
+
+input, textarea {
     width: 500px;
     border: none;
     border-radius: 20px;
@@ -119,21 +135,23 @@ input, textarea{
     -moz-transition: border 0.5s;
     -o-transition: border 0.5s;
     border: solid 3px #98d4f3;
-    -webkit-box-sizing:border-box;
-    -moz-box-sizing:border-box;
-    box-sizing:border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 
 }
-input:focus, textarea:focus{
+
+input:focus, textarea:focus {
     border: solid 3px #77bde0;
 }
 
-textarea{
+textarea {
     height: 100px;
     resize: none;
     overflow: auto;
 }
-input[type="submit"]{
+
+input[type="submit"] {
     background-color: #F90;
     color: white;
     height: 50px;
@@ -146,16 +164,19 @@ input[type="submit"]{
     -o-transition: background-color 0.5s;
     transition: background-color 0.5s;
 }
-input[type="submit"]:hover{
+
+input[type="submit"]:hover {
     background-color: #e58f0e;
 
 }
-label{
+
+label {
     font-size: 1.5em;
     margin-top: 20px;
     padding-left: 20px;
 }
-.formgroup, .formgroup-active, .formgroup-error{
+
+.formgroup, .formgroup-active, .formgroup-error {
     background-repeat: no-repeat;
     background-position: right bottom;
     background-size: 10.5%;
@@ -166,10 +187,15 @@ label{
     width: 566px;
     padding-top: 2px;
 }
-#warn{
-    display:none;  text-align:center;
+
+#warn {
+    display: none;
+    text-align: center;
 }
-button{
+input [type="checkbox"]{
+    margin-left: 25px;
+}
+button {
     background-color: #F90;
     color: white;
     height: 50px;
@@ -181,4 +207,12 @@ button{
     -moz-transition: background-color 0.5s;
     -o-transition: background-color 0.5s;
     transition: background-color 0.5s;
+}
+
+.hide {
+    display: none
+}
+
+.show {
+    display: block
 }

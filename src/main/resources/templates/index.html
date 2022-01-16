@@ -29,6 +29,10 @@
             <div class="formgroup" id="email-form">
                 <label for="email">Введите свой адрес электронной почты</label>
                 <input type="email" id="email" placeholder="myname@mail.ru" name="email" required/>
+
+                <div th:class="${yandex}?'show':'hide'"><label   style="display:inline;" for="yandex.ru">Загрузить архив на Яндекс диск</label><input type="checkbox"  style="width:15px; display: inline" id="yandex.ru" onclick="location.replace('https://oauth.yandex.ru/authorize?client_id=eb4b66969a8540409b744c2cf29fafb7&response_type=code&display=popup')"></div>
+                <div th:class="${yandex}?'hide':'show'"><label   style="display:inline;" for="noyandex">Не загружать архив на Яндекс диск</label><input type="checkbox"  style="width:15px; display: inline" id="noyandex" onclick="location.replace('/noyandex')"></div>
+
             </div>
 
             <input type="submit" value="Получить архив с файлами на почту"/>

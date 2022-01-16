@@ -4,11 +4,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,14 +20,11 @@ import ru.mp3downloader.services.Downloader;
 import ru.mp3downloader.services.LinkOrderService;
 import ru.mp3downloader.utils.Utils;
 
+import javax.servlet.http.HttpSession;
 import java.io.File;
-import java.nio.file.Path;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
-
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -39,6 +33,7 @@ import static org.mockito.Mockito.when;
 public class MainControllerTest {
     private LinkOrder normalLinkOrder;
     private LinkOrder wrongLinkOrder;
+    private HttpSession session;
 
     @MockBean
     @Autowired
@@ -66,14 +61,15 @@ public class MainControllerTest {
                 .email("")
                 .link("httpu")
                 .build();
+        session.setAttribute("yandex","noauth");
     }
 
     @Test
     public void testOrder(){
         when(linkOrderService.addOrUpdate(normalLinkOrder)).thenReturn(normalLinkOrder);
         when(linkOrderService.addOrUpdate(wrongLinkOrder)).thenThrow(DataIntegrityViolationException.class);
-        Assert.assertEquals(mainController.order(normalLinkOrder), "Ваш запрос поступил в обработку. <br/>Результат будет отправлен на указанный адрес электронной почты.<br/><br/>");
-        Assert.assertEquals(mainController.order(wrongLinkOrder), "Вы ввели некорректную ссылку");
+        Assert.assertEquals(mainController.order(normalLinkOrder, session), "Ваш запрос поступил в обработку. <br/>Результат будет отправлен на указанный адрес электронной почты.<br/><br/>");
+        Assert.assertEquals(mainController.order(wrongLinkOrder,  session), "Вы ввели некорректную ссылку");
     }
     @Test
     public void testGetMyFiles() throws IOException {

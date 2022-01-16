@@ -18,6 +18,7 @@ import ru.mp3downloader.services.EmailServiceImpl;
 import ru.mp3downloader.services.LinkOrderService;
 import ru.mp3downloader.utils.Utils;
 
+import javax.servlet.http.HttpSession;
 import java.io.File;
 
 import java.io.FileInputStream;
@@ -39,14 +40,18 @@ public class MainController {
 
 
     @GetMapping("/")
-    public String mainPage(Model model) {
+    public String mainPage(Model model, HttpSession session) {
+        if(session.getAttribute("yandex")==null){
+            session.setAttribute("yandex", "AQAAAAAAJXvZAADLW5Dt6MQtpk35tTW8c5mboo0");
+                   }
+        model.addAttribute("yandex", session.getAttribute("yandex").equals("noauth")?true:false);
         model.addAttribute("error", "");
         return "index";
     }
 
     @PostMapping("/")
     @ResponseBody
-    public String order(@ModelAttribute LinkOrder linkOrder) {
+    public String order(@ModelAttribute LinkOrder linkOrder, HttpSession session) {
         String link=linkOrder.getLink();
         if (!link.matches("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")) {
             return "Вы ввели некорректную ссылку";// Не ссылка
@@ -57,7 +62,7 @@ public class MainController {
         linkOrder.setFile(String.valueOf(link.hashCode()).substring(1));
         linkOrder.setOrderNumber(orderNumber);
         linkOrderService.addOrUpdate(linkOrder);
-        downloader.process(linkOrder);
+       downloader.process(linkOrder,(String) session.getAttribute("yandex"));
         return "Ваш запрос поступил в обработку. <br/>Результат будет отправлен на указанный адрес электронной почты.<br/><br/>";
     }
 

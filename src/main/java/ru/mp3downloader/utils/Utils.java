@@ -1,6 +1,7 @@
 package ru.mp3downloader.utils;
 
 
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -23,11 +25,14 @@ import java.util.zip.ZipOutputStream;
 
 @Slf4j
 public class Utils {
+
     public static String downloads ="downloads";
     public static String  output="output";
+
     public static String fileSafeName(String text) {// Убираем недопустимые символы в имени файла
         text = text.trim();
         text = text.replaceAll("\"", "");
+        text = text.replaceAll(" ","_");
         text = text.replaceAll("<", "");
         text = text.replaceAll(">", "");
         text = text.replaceAll(":", "");
@@ -36,6 +41,7 @@ public class Utils {
         text = text.replaceAll("\\|", "");
         text = text.replaceAll("\\?", "");
         text = text.replaceAll("\\*", "");
+        text = text.replaceAll("ʹ", "");
         return text;
     }
 
@@ -59,6 +65,17 @@ public class Utils {
       }
       return false;
     }
+    public static String getGeneralDirName(LinkOrder linkOrder){
+        String[] chunks=linkOrder.getLink().split("/");
+        StringBuffer sf=new StringBuffer("");
+        for(int i=0; i<chunks.length-1; i++){
+            if(i > 1){
+                sf.append(chunks[i]+"_");
+            }
+        }
+        sf.append(chunks[chunks.length-1]);
+        return  Utils.fileSafeName(sf.toString());
+    }
 
     public static Map<String, String> getPage(String urls) throws IOException {// Получили список имя файла-ссылка
         HashMap<String, String> output = new HashMap<>();
@@ -76,7 +93,7 @@ public class Utils {
                     int i = 1;
                     while (output.containsKey(text)) {// Добавляем порядковый номер в конце файла
                         if (i == 1) {
-                            text = text + " " + Integer.toString(i); // Для первого случая приписываем в конце 1
+                            text = text + "_" + Integer.toString(i); // Для первого случая приписываем в конце 1
                         } else {
                             int j = i - 1;
                             text = text.replace(Integer.toString(j), Integer.toString(i)); // Если файлов с этим именем больше одного, в последнем файле заменяем на следующий номер
@@ -85,7 +102,6 @@ public class Utils {
                     }
                 }
 
-                // Получаем абсолютную ссылку
                 output.put(text, link); // Добавляем в конец
 
             }
@@ -114,7 +130,7 @@ public class Utils {
     public static void createArchive(LinkOrder linkOrder, Map<String, String> linkList) throws IOException {
         FileOutputStream fos = new FileOutputStream(Utils.getArchive(linkOrder));
         ZipOutputStream zipOut = new ZipOutputStream(fos, java.nio.charset.StandardCharsets.UTF_8);
-        for (HashMap.Entry<String, String> element : linkList.entrySet()) {
+        for (Map.Entry<String, String> element : linkList.entrySet()) {
             log.info(element.getKey() + " " + element.getValue());
             String downloadedFile = downloads + "/" + element.getKey() + ".mp3";
             Utils.downloadFile(element.getValue(), downloadedFile);// Загружаем файл
