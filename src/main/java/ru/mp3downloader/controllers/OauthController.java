@@ -5,17 +5,13 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import ru.mp3downloader.exception.AuthorizationErrorException;
-import ru.mp3downloader.model.Yandex;
-
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.Optional;
@@ -23,7 +19,9 @@ import java.util.Optional;
 @Slf4j
 @Controller
 public class OauthController {
-    private String url = "https://oauth.yandex.ru/token";
+
+    @Value("${yandex.oauth.address}")
+    private String url;
 
     @Value("${yandex.client.id}")
     private String clientId;

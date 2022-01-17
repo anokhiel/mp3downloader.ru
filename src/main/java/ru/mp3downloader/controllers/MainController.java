@@ -2,6 +2,7 @@ package ru.mp3downloader.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,8 @@ import java.time.LocalDateTime;
 @Slf4j
 @Controller
 public class MainController {
+    @Value("${yandex.client.id}")
+    private String clientId;
 
     @Autowired
     EmailServiceImpl emailService;
@@ -41,44 +44,45 @@ public class MainController {
 
     @GetMapping("/")
     public String mainPage(Model model, HttpSession session) {
-        if(session.getAttribute("yandex")==null){
-            session.setAttribute("yandex", "AQAAAAAAJXvZAADLW5Dt6MQtpk35tTW8c5mboo0");
-                   }
-        model.addAttribute("yandex", session.getAttribute("yandex").equals("noauth")?true:false);
+        if (session.getAttribute("yandex") == null) {
+            session.setAttribute("yandex", "noauth");
+        }
+        model.addAttribute("yandex", session.getAttribute("yandex").equals("noauth"));
         model.addAttribute("error", "");
+        model.addAttribute("clientId", clientId);
         return "index";
     }
 
     @PostMapping("/")
     @ResponseBody
     public String order(@ModelAttribute LinkOrder linkOrder, HttpSession session) {
-        String link=linkOrder.getLink();
+        String link = linkOrder.getLink();
         if (!link.matches("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")) {
             return "Вы ввели некорректную ссылку";// Не ссылка
         }
-        Long orderNumber=(long)(link+linkOrder.getEmail()).hashCode();
-        linkOrder=linkOrderService.findOrderByOrderNumber(orderNumber).orElse(linkOrder);
+        Long orderNumber = (long) (link + linkOrder.getEmail()).hashCode();
+        linkOrder = linkOrderService.findOrderByOrderNumber(orderNumber).orElse(linkOrder);
         linkOrder.setOrdered(LocalDateTime.now());
         linkOrder.setFile(String.valueOf(link.hashCode()).substring(1));
         linkOrder.setOrderNumber(orderNumber);
         linkOrderService.addOrUpdate(linkOrder);
-       downloader.process(linkOrder,(String) session.getAttribute("yandex"));
+        downloader.process(linkOrder, (String) session.getAttribute("yandex"));
         return "Ваш запрос поступил в обработку. <br/>Результат будет отправлен на указанный адрес электронной почты.<br/><br/>";
     }
 
     @GetMapping("/getmyfiles/{orderNumber}")
     public ResponseEntity getMyFiles(@PathVariable Long orderNumber) {
-        log.info("Download started for " + orderNumber +".zip");
+        log.info("Download started for " + orderNumber + ".zip");
         HttpHeaders headers = new HttpHeaders();
         try {
-            LinkOrder linkOrder = linkOrderService.findOrderByOrderNumber(orderNumber).orElseThrow(() -> new WrongLinkException() );
-            File archive = new File(Utils.output+"/" + linkOrder.getFile()+ ".zip");
+            LinkOrder linkOrder = linkOrderService.findOrderByOrderNumber(orderNumber).orElseThrow(() -> new WrongLinkException());
+            File archive = new File(Utils.output + "/" + linkOrder.getFile() + ".zip");
             if (!archive.exists()) {
                 throw new ArchiveNotFound();
             }
             linkOrder.setDownloaded(LocalDateTime.now());
             linkOrderService.addOrUpdate(linkOrder);
-            log.info("Download "+ orderNumber +" started");
+            log.info("Download " + orderNumber + " started");
             headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
             headers.add("Content-Type", "application/zip");
             headers.add("Pragma", "no-cache");

@@ -21,3 +21,8 @@ email.smtp.starttls.enable=true
 
 email.debug=true
 email.from.address=mail@address.ru
+
+yandex.client.id = client_id
+yandex.client.secret = client_secret
+yandex.api.link = https://cloud-api.yandex.net/v1/disk/resources
+yandex.oauth.address = https://oauth.yandex.ru/token

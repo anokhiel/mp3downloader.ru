@@ -67,7 +67,7 @@ public class Downloader {
                 }
             }catch(YandexException e){
                errorMessage=e.getMessage();
-                informUser(linkOrder, YANDEXEXCEPTION);
+               informUser(linkOrder, YANDEXEXCEPTION);
 
             } catch (Exception e) {
                 informUser(linkOrder, EXCEPTION);
@@ -79,28 +79,30 @@ public class Downloader {
     }
 
 
-    private boolean executor(LinkOrder linkOrder) throws IOException, YandexException {
-        Map<String, String> linkList = Utils.getPage(linkOrder.getLink());// Получаем список "имя файла"->"ссылка"
-        if (!linkList.isEmpty()) {// Если список не пустой
-            if (token.equals("noauth")) {
-                if (Utils.fileExists(linkOrder)) {
-                    return true;
-                }
-                Utils.createArchive(linkOrder, linkList);
-                return true;// Загрузили нормально
-            } else {
-                yandexDir=Utils.getGeneralDirName(linkOrder);
-                YandexUpdoader yandexUpdoader = YandexUpdoader
-                        .builder()
-                        .token(token)
-                        .root("mp3downloader")
-                        .linkList(linkList).dir(yandexDir)
-                        .cloudLink(cloudLink)
-                        .build();
+    private boolean executor(LinkOrder linkOrder) throws  YandexException, IOException {
 
-                return yandexUpdoader.uploadAllFiles();
+            Map<String, String> linkList = Utils.getPage(linkOrder.getLink());// Получаем список "имя файла"->"ссылка"
+            if (!linkList.isEmpty()) {// Если список не пустой
+                if (token.equals("noauth")) {// Загрузка в архив
+                    if (Utils.fileExists(linkOrder)) {
+                        return true;
+                    }
+                    Utils.createArchive(linkOrder, linkList);
+                    return true;// Загрузили нормально
+                } else {
+                    yandexDir = Utils.getGeneralDirName(linkOrder);// Загрузка на Яндекс диск
+                    YandexUpdoader yandexUpdoader = YandexUpdoader
+                            .builder()
+                            .token(token)
+                            .root("mp3downloader")
+                            .linkList(linkList).dir(yandexDir)
+                            .cloudLink(cloudLink)
+                            .build();
+
+                    return yandexUpdoader.uploadAllFiles();
+                }
             }
-        }
+
         return false;
     }
 
