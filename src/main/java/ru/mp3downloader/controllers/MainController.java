@@ -41,7 +41,12 @@ public class MainController {
     @Autowired
     private Downloader downloader;
 
-
+    /**
+     * Главная страница
+     * @param model
+     * @param session
+     * @return
+     */
     @GetMapping("/")
     public String mainPage(Model model, HttpSession session) {
         if (session.getAttribute("yandex") == null) {
@@ -53,6 +58,12 @@ public class MainController {
         return "index";
     }
 
+    /**
+     * Ссылка для передачи заказа по Ajax
+     * @param linkOrder
+     * @param session
+     * @return
+     */
     @PostMapping("/")
     @ResponseBody
     public String order(@ModelAttribute LinkOrder linkOrder, HttpSession session) {
@@ -70,6 +81,11 @@ public class MainController {
         return "Ваш запрос поступил в обработку. <br/>Результат будет отправлен на указанный адрес электронной почты.<br/><br/>";
     }
 
+    /**
+     * Ссылка для скачивания архива
+     * @param orderNumber
+     * @return
+     */
     @GetMapping("/getmyfiles/{orderNumber}")
     public ResponseEntity getMyFiles(@PathVariable Long orderNumber) {
         log.info("Download started for " + orderNumber + ".zip");
@@ -106,6 +122,12 @@ public class MainController {
 
     }
 
+    /**
+     * Страница ошибки
+     * @param mes
+     * @param model
+     * @return
+     */
     @GetMapping("/errorpage/{mes}")
     public String errorPage(@PathVariable String mes, Model model) {
         model.addAttribute("error", mes);

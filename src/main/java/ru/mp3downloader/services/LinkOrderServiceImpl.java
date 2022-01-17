@@ -7,6 +7,10 @@ import ru.mp3downloader.model.LinkOrder;
 import ru.mp3downloader.repository.LinkOrderRepository;
 import java.util.Optional;
 
+/**
+ * Имплементация стандартного интерфейса для обработки сущности заказов
+ */
+
 @Service
 @EqualsAndHashCode
 class LinkOrderServiceImpl implements  LinkOrderService {

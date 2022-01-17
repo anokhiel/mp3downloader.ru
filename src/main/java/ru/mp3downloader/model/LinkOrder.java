@@ -1,14 +1,13 @@
 package ru.mp3downloader.model;
 
-
 import lombok.*;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
-import java.nio.file.Path;
-import java.time.DateTimeException;
 import java.time.LocalDateTime;
 
+/**
+ * Сущность для сбора сведений о заказах
+ */
 @Entity
 @Setter
 @Getter
@@ -38,7 +37,7 @@ public class LinkOrder {
     @Column(nullable = false)
     private String file; // Название файла
 
-    @Column(nullable = false)
+    @Column(nullable = false) // Идентификатор заказа (имя архива)
     private Long orderNumber;
 
 }

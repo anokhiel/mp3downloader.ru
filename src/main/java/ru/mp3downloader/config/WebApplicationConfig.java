@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Данный файл содержит конфигурацию для переадресации с несуществующих страниц на главную
+ */
 @Configuration
 public class WebApplicationConfig implements WebMvcConfigurer {
 

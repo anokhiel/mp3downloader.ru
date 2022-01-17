@@ -1,5 +1,9 @@
 package ru.mp3downloader.model;
 
+/**
+ * Enum для организации статуса заказа. Содержит данные для отправки уведомлений
+ */
+
 public enum Status {
     OK("Здравствуйте.\n Вы можете скачать архив с файлами mp3 с сайта %link% по адресу  http://mp3downloader.ru/getmyfiles/%key% в течение часа после получения данного сообщения."),
     YANDEX("Здравствуйте.\n Файлы mp3 с сайта %link%  загружены на ваш Яндекс диск в папку mp3downloader/%%yandexdir%%."),

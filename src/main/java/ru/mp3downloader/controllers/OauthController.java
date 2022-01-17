@@ -12,9 +12,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.mp3downloader.exception.AuthorizationErrorException;
+
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.Optional;
+
+/**
+ * Контроллер для получения токена Яндекс-диска
+ */
 
 @Slf4j
 @Controller
@@ -46,7 +51,7 @@ public class OauthController {
             String str = response.getEntity(String.class);
             JSONObject json = new JSONObject(str);
             session.setAttribute("yandex", json.getString("access_token"));
-            log.info("Получен ответ от yandexa "+json.getString("access_token"));
+            log.info("Получен ответ от yandexa " + json.getString("access_token"));
             return "redirect:/";
 
         } catch (Exception e) {
@@ -56,8 +61,15 @@ public class OauthController {
 
         }
     }
+
+    /**
+     * Адрес для удаления токена
+     *
+     * @param session
+     * @return
+     */
     @GetMapping("/noyandex")
-    public String noYandex(HttpSession session){
+    public String noYandex(HttpSession session) {
         session.setAttribute("yandex", "noauth");
         return "redirect:/";
     }

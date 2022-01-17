@@ -1,7 +1,6 @@
 package ru.mp3downloader.utils;
 
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
@@ -17,22 +16,25 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * Класс утилита со статическими методами, используемыми в приложении
+ */
+
 @Slf4j
 public class Utils {
 
-    public static String downloads ="downloads";
-    public static String  output="output";
+    public static String downloads = "downloads";
+    public static String output = "output";
 
     public static String fileSafeName(String text) {// Убираем недопустимые символы в имени файла
         text = text.trim();
         text = text.replaceAll("\"", "");
-        text = text.replaceAll(" ","_");
+        text = text.replaceAll(" ", "_");
         text = text.replaceAll("<", "");
         text = text.replaceAll(">", "");
         text = text.replaceAll(":", "");
@@ -45,7 +47,7 @@ public class Utils {
         return text;
     }
 
-    public static void zipFile(File fileToZip, ZipOutputStream zipOut) throws IOException {
+    public static void zipFile(File fileToZip, ZipOutputStream zipOut) throws IOException {// Добавление файла в архив
         FileInputStream fis = new FileInputStream(fileToZip);
         ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
         zipOut.putNextEntry(zipEntry);
@@ -57,27 +59,28 @@ public class Utils {
         fis.close();
     }
 
-    public static boolean fileExists(LinkOrder linkOrder) {
-        File file=new File(Utils.getArchive(linkOrder));
-      if(file.exists()) {
-          file.setLastModified(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());// Продлить время до стирания
-          return  true;
-      }
-      return false;
-    }
-    public static String getGeneralDirName(LinkOrder linkOrder){
-        String[] chunks=linkOrder.getLink().split("/");
-        StringBuffer sf=new StringBuffer("");
-        for(int i=0; i<chunks.length-1; i++){
-            if(i > 1){
-                sf.append(chunks[i]+"_");
-            }
+    public static boolean fileExists(LinkOrder linkOrder) {// Проверка существования архива заказа для предотвращения повторной загрузки
+        File file = new File(Utils.getArchive(linkOrder));
+        if (file.exists()) {
+            file.setLastModified(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());// Продлить время до стирания
+            return true;
         }
-        sf.append(chunks[chunks.length-1]);
-        return  Utils.fileSafeName(sf.toString());
+        return false;
     }
 
-    public static Map<String, String> getPage(String urls) throws IOException {// Получили список имя файла-ссылка
+    public static String getGeneralDirName(LinkOrder linkOrder) {// Генерация имени папки на Яндекс диске по ссылке
+        String[] chunks = linkOrder.getLink().split("/");
+        StringBuffer sf = new StringBuffer("");
+        for (int i = 0; i < chunks.length - 1; i++) {
+            if (i > 1) {
+                sf.append(chunks[i] + "_");
+            }
+        }
+        sf.append(chunks[chunks.length - 1]);
+        return Utils.fileSafeName(sf.toString());
+    }
+
+    public static Map<String, String> getPage(String urls) throws IOException {// Получение списка имя файла-ссылка
         HashMap<String, String> output = new HashMap<>();
         Document htmlDoc = Jsoup.connect(urls).userAgent("Mozilla").get();
         Elements elements = htmlDoc.getElementsByTag("a");// Получаем все ссылки
@@ -123,11 +126,11 @@ public class Utils {
         }
     }
 
-    public static String getArchive(LinkOrder linkOrder) {
-        return output+"/" + linkOrder.getFile() + ".zip";
+    public static String getArchive(LinkOrder linkOrder) {// Получение полного имени архива
+        return output + "/" + linkOrder.getFile() + ".zip";
     }
 
-    public static void createArchive(LinkOrder linkOrder, Map<String, String> linkList) throws IOException {
+    public static void createArchive(LinkOrder linkOrder, Map<String, String> linkList) throws IOException {// Формирование архива со скаченными  файлами
         FileOutputStream fos = new FileOutputStream(Utils.getArchive(linkOrder));
         ZipOutputStream zipOut = new ZipOutputStream(fos, java.nio.charset.StandardCharsets.UTF_8);
         for (Map.Entry<String, String> element : linkList.entrySet()) {

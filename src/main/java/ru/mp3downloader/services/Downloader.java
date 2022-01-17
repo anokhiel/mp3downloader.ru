@@ -19,6 +19,9 @@ import java.util.Map;
 
 import static ru.mp3downloader.model.Status.*;
 
+/**
+ * Сервис загрузки файлов
+ */
 @Slf4j
 @Service
 @NoArgsConstructor
@@ -28,17 +31,17 @@ public class Downloader {
 
     LinkOrder linkOrder;
 
-    String errorMessage ="";
+    String errorMessage = "";
 
     String token;
 
-    String yandexDir="";
+    String yandexDir = "";
 
     @Autowired
     private EmailServiceImpl emailService;
 
     @PostConstruct
-    private void init() {
+    private void init() {// Создание рабочих папок
         try {
             Files.createDirectories(Paths.get(Utils.output));
             Files.createDirectories(Paths.get(Utils.downloads));
@@ -47,29 +50,28 @@ public class Downloader {
         }
     }
 
-    public void process(LinkOrder linkOrder, String token) {
+    public void process(LinkOrder linkOrder, String token) {// Обработка заказов
         this.token = token;
         this.linkOrder = linkOrder;
         Runnable r = () -> {
             try {
                 if (executor(linkOrder)) {
-                    if (token.equals("noauth")) {
+                    if (token.equals("noauth")) {// Если нужно создать архив
                         informUser(linkOrder, OK);
                         log.info("For " + linkOrder.toString() + " Status OK");
-                    } else {
+                    } else {// Если нужно загрузить на Яндекс диск
                         log.info("For " + linkOrder.toString() + " Status OK");
-                        informUser(linkOrder,YANDEX);
+                        informUser(linkOrder, YANDEX);
                     }
-                } else {
+                } else {// Если файлов не найдено
                     log.info("For " + linkOrder.toString() + " Status NOFILESFOUND");
                     informUser(linkOrder, NOFILESFOUND);
 
                 }
-            }catch(YandexException e){
-               errorMessage=e.getMessage();
-               informUser(linkOrder, YANDEXEXCEPTION);
-
-            } catch (Exception e) {
+            } catch (YandexException e) {// Если произошла ошибка загрузки на Яндекс диск
+                errorMessage = e.getMessage();
+                informUser(linkOrder, YANDEXEXCEPTION);
+            } catch (Exception e) {// Если произошли прочие ошибки
                 informUser(linkOrder, EXCEPTION);
                 log.info("For " + linkOrder.toString() + " Status EXCEPTION");
                 e.printStackTrace();
@@ -79,35 +81,35 @@ public class Downloader {
     }
 
 
-    private boolean executor(LinkOrder linkOrder) throws  YandexException, IOException {
+    private boolean executor(LinkOrder linkOrder) throws YandexException, IOException {
 
-            Map<String, String> linkList = Utils.getPage(linkOrder.getLink());// Получаем список "имя файла"->"ссылка"
-            if (!linkList.isEmpty()) {// Если список не пустой
-                if (token.equals("noauth")) {// Загрузка в архив
-                    if (Utils.fileExists(linkOrder)) {
-                        return true;
-                    }
-                    Utils.createArchive(linkOrder, linkList);
-                    return true;// Загрузили нормально
-                } else {
-                    yandexDir = Utils.getGeneralDirName(linkOrder);// Загрузка на Яндекс диск
-                    YandexUpdoader yandexUpdoader = YandexUpdoader
-                            .builder()
-                            .token(token)
-                            .root("mp3downloader")
-                            .linkList(linkList).dir(yandexDir)
-                            .cloudLink(cloudLink)
-                            .build();
-
-                    return yandexUpdoader.uploadAllFiles();
+        Map<String, String> linkList = Utils.getPage(linkOrder.getLink());// Получаем список "имя файла"->"ссылка"
+        if (!linkList.isEmpty()) {// Если список не пустой
+            if (token.equals("noauth")) {// Загрузка в архив
+                if (Utils.fileExists(linkOrder)) {
+                    return true;
                 }
+                Utils.createArchive(linkOrder, linkList);
+                return true;// Загрузили нормально
+            } else {
+                yandexDir = Utils.getGeneralDirName(linkOrder);// Загрузка на Яндекс диск
+                YandexUpdoader yandexUpdoader = YandexUpdoader
+                        .builder()
+                        .token(token)
+                        .root("mp3downloader")
+                        .linkList(linkList).dir(yandexDir)
+                        .cloudLink(cloudLink)
+                        .build();
+
+                return yandexUpdoader.uploadAllFiles();
             }
+        }
 
         return false;
     }
 
 
-    private void informUser(LinkOrder linkOrder, Status status) {
+    private void informUser(LinkOrder linkOrder, Status status) {// Отправка письма пользователю с результатами загрузки
         try {
             emailService.sendMail(
                     linkOrder.getEmail(),
@@ -116,7 +118,7 @@ public class Downloader {
                             .replaceAll("%link%", linkOrder.getLink())
                             .replaceAll("%key%", Long.toString(linkOrder.getOrderNumber()))
                             .replaceAll("%%yandexdir%%", yandexDir)
-                            .replaceAll("%errormessage%",errorMessage)
+                            .replaceAll("%errormessage%", errorMessage)
             );
             log.info("Email sent to email " + linkOrder.getEmail() + ", subject: " +
                     status.getSubject() + " text: " +
@@ -125,7 +127,7 @@ public class Downloader {
                             .replaceAll("%key%", linkOrder.getFile())
             );
         } catch (Exception e) {
-
+            log.info(("Error while sending email to user"));
             e.printStackTrace();
         }
     }

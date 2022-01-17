@@ -12,6 +12,9 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
 
+/**
+ * Сервис отсылки почты
+ */
 
 @Slf4j
 @Service
