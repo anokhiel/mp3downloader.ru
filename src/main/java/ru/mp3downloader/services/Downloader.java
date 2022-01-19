@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import ru.mp3downloader.exception.YandexException;
 import ru.mp3downloader.model.LinkOrder;
 import ru.mp3downloader.model.Status;
+import ru.mp3downloader.utils.Cleaner;
 import ru.mp3downloader.utils.Utils;
 import ru.mp3downloader.utils.YandexUpdoader;
 
@@ -59,6 +60,9 @@ public class Downloader {
                     if (token.equals("noauth")) {// Если нужно создать архив
                         informUser(linkOrder, OK);
                         log.info("For " + linkOrder.toString() + " Status OK");
+                        Thread cleaner=new Thread( new Cleaner(linkOrder),"Clean"+linkOrder.getOrderNumber());
+                        cleaner.setDaemon(true);
+                        cleaner.start();
                     } else {// Если нужно загрузить на Яндекс диск
                         log.info("For " + linkOrder.toString() + " Status OK");
                         informUser(linkOrder, YANDEX);

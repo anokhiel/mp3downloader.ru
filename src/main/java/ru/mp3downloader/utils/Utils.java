@@ -130,6 +130,7 @@ public class Utils {
         return output + "/" + linkOrder.getFile() + ".zip";
     }
 
+
     public static void createArchive(LinkOrder linkOrder, Map<String, String> linkList) throws IOException {// Формирование архива со скаченными  файлами
         FileOutputStream fos = new FileOutputStream(Utils.getArchive(linkOrder));
         ZipOutputStream zipOut = new ZipOutputStream(fos, java.nio.charset.StandardCharsets.UTF_8);
