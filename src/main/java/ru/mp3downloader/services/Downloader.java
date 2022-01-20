@@ -42,10 +42,13 @@ public class Downloader {
     private EmailServiceImpl emailService;
 
     @PostConstruct
-    private void init() {// Создание рабочих папок
+    private void init() {// Создание рабочих папок. Запуск сборщика мусора
         try {
             Files.createDirectories(Paths.get(Utils.output));
             Files.createDirectories(Paths.get(Utils.downloads));
+            Thread cleaner=new Thread( new Cleaner(),"Cleaner");
+            cleaner.setDaemon(true);
+            cleaner.start();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,9 +63,7 @@ public class Downloader {
                     if (token.equals("noauth")) {// Если нужно создать архив
                         informUser(linkOrder, OK);
                         log.info("For " + linkOrder.toString() + " Status OK");
-                        Thread cleaner=new Thread( new Cleaner(linkOrder),"Clean"+linkOrder.getOrderNumber());
-                        cleaner.setDaemon(true);
-                        cleaner.start();
+
                     } else {// Если нужно загрузить на Яндекс диск
                         log.info("For " + linkOrder.toString() + " Status OK");
                         informUser(linkOrder, YANDEX);
