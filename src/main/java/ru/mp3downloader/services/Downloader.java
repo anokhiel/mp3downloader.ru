@@ -46,9 +46,6 @@ public class Downloader {
         try {
             Files.createDirectories(Paths.get(Utils.output));
             Files.createDirectories(Paths.get(Utils.downloads));
-            Thread cleaner=new Thread( new Cleaner(),"Cleaner");
-            cleaner.setDaemon(true);
-            cleaner.start();
         } catch (IOException e) {
             e.printStackTrace();
         }

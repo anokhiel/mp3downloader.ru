@@ -2,7 +2,7 @@
 It looks for all links on the page, then downloads the files renaming them as they are named on the page, and then sends the 
 link to the archive the email provided by user.
 
-The link is active for an hour. Then the downloaded archives are deleted by the cron job.
+The link is active for an hour. Then the downloaded archives are deleted by the cleaner thread that runs in the background.
 
 Another option is uploading the files to Yandex drive directly. It demands on authorization with Yandex. 
 
