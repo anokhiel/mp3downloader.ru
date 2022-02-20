@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import ru.mp3downloader.exception.YandexException;
 import ru.mp3downloader.model.LinkOrder;
 import ru.mp3downloader.model.Status;
-import ru.mp3downloader.utils.Cleaner;
 import ru.mp3downloader.utils.Utils;
 import ru.mp3downloader.utils.YandexUpdoader;
 
@@ -42,7 +41,7 @@ public class Downloader {
     private EmailServiceImpl emailService;
 
     @PostConstruct
-    private void init() {// Создание рабочих папок. Запуск сборщика мусора
+    private void init() {// Создание рабочих папок.
         try {
             Files.createDirectories(Paths.get(Utils.output));
             Files.createDirectories(Paths.get(Utils.downloads));

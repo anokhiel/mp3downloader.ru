@@ -1,9 +1,8 @@
-## Application for downloading mp3 files from pages with direct links.
-It looks for all links on the page, then downloads the files renaming them as they are named on the page, and then sends the 
-link to the archive the email provided by user.
+## Тестовое приложение для скачивания mp3 файлов по прямым сслыкам.
+На странице приложения нужно ввести email и ссылку на страницу с файлами.
+Загрузка происходит, по выбору пользователя, либо в архив, ссылка на который действительна  в течение часа после загрузки, либо на Яндекс диск пользователя, после предоставления соответствующих прав.
+В отличие от других загрузчиков приложение переименовывает файлы так, как они называны на странице.
+О результате работы приложения приходит оповещение на адрес электронной почты пользователя. 
+Рабочий пример находится здесь:  [https://mp3downloader.ru](http://mp3downloader.ru "https://mp3downloader.ru").
+Для тестирования можно использовать ссылку:  [http://kkre-1.narod.ru/akulenko.htm](http://kkre-1.narod.ru/akulenko.htm "http://kkre-1.narod.ru/akulenko.htm").
 
-The link is active for an hour. Then the downloaded archives are deleted by the cleaner thread that runs in the background.
-
-Another option is uploading the files to Yandex drive directly. It demands on authorization with Yandex. 
-
-The working instance is deployed to the address [https://mp3downloader.ru](http://mp3downloader.ru "https://mp3downloader.ru").
