@@ -21,9 +21,6 @@
     </properties>
 
     <dependencies>
-
-
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
@@ -167,7 +164,7 @@
                                 </mainClass>
                             </configuration>
                         </execution>
-                    </executions>
+                                            </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -178,6 +175,14 @@
                     </configuration>
                 </plugin>
             </plugins>
-
+        <extensions>
+            <!-- Enabling the use of FTP -->
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ftp</artifactId>
+                <version>1.0-beta-6</version>
+            </extension>
+        </extensions>
     </build>
+
 </project>
