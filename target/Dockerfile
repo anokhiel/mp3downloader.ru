@@ -1,4 +1,5 @@
 FROM openjdk:8-jdk-alpine
-VOLUME /tmp
-COPY mp3downloader-spring-boot.jar mp3downloader-spring-boot.jar
-ENTRYPOINT ["java","-jar","/mp3downloader-spring-boot.jar"]
+RUN mkdir -p /usr/src/app/
+WORKDIR /usr/src/app/
+COPY . /usr/src/app/
+CMD ["java","-jar","/mp3downloader-spring-boot.jar"]
