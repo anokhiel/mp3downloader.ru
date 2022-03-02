@@ -56,7 +56,7 @@ public class OauthController {
 
         } catch (Exception e) {
 
-            e.printStackTrace();
+            log.error("Exception has occured", e);
             return "redirect:/";
 
         }

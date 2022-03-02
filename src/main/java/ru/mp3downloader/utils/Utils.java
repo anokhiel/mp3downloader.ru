@@ -122,7 +122,7 @@ public class Utils {
             }
         } catch (IOException e) {
             log.info("Ошибка загрузки файла " + fileName);
-            e.printStackTrace();
+            log.error("Exception has occured", e);
         }
     }
 

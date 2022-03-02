@@ -37,9 +37,6 @@ public class EmailSenderConfig {
     @Value("${email.debug}")
     private String debug;
 
-    @Value("@{email.}")
-
-
     @Bean
     public JavaMailSender getJavaMailSender() {
 

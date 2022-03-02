@@ -21,6 +21,8 @@ import static ru.mp3downloader.model.Status.*;
 
 /**
  * Сервис загрузки файлов
+ * Да. Я в курсе, что это не по SOLID, но переделывать нет времени.
+ * Так случилось, потому что я брал этот класс из раннего десктопного проекта с тем же функционалом, а потом еще добавил Яндекс.
  */
 @Slf4j
 @Service
@@ -31,9 +33,7 @@ public class Downloader {
 
     LinkOrder linkOrder;
 
-    String errorMessage = "";
-
-    String token;
+   String token;
 
     String yandexDir = "";
 
@@ -43,17 +43,18 @@ public class Downloader {
     @PostConstruct
     private void init() {// Создание рабочих папок.
         try {
+
             Files.createDirectories(Paths.get(Utils.output));
             Files.createDirectories(Paths.get(Utils.downloads));
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Exception has occured", e);
         }
     }
 
     public void process(LinkOrder linkOrder, String token) {// Обработка заказов
-        this.token = token;
-        this.linkOrder = linkOrder;
-        Runnable r = () -> {
+
+            Runnable r = () -> {
+            String errorMessage = "";
             try {
                 if (executor(linkOrder)) {
                     if (token.equals("noauth")) {// Если нужно создать архив
@@ -75,7 +76,7 @@ public class Downloader {
             } catch (Exception e) {// Если произошли прочие ошибки
                 informUser(linkOrder, EXCEPTION);
                 log.info("For " + linkOrder.toString() + " Status EXCEPTION");
-                e.printStackTrace();
+                log.error("Exception has occured", e);
             }
         };
         new Thread(r, "process").start();
@@ -98,7 +99,8 @@ public class Downloader {
                         .builder()
                         .token(token)
                         .root("mp3downloader")
-                        .linkList(linkList).dir(yandexDir)
+                        .linkList(linkList)
+                        .dir(yandexDir)
                         .cloudLink(cloudLink)
                         .build();
 
@@ -111,6 +113,7 @@ public class Downloader {
 
 
     private void informUser(LinkOrder linkOrder, Status status) {// Отправка письма пользователю с результатами загрузки
+        String errorMessage = "";
         try {
             emailService.sendMail(
                     linkOrder.getEmail(),
@@ -129,7 +132,7 @@ public class Downloader {
             );
         } catch (Exception e) {
             log.info(("Error while sending email to user"));
-            e.printStackTrace();
+            log.error("Exception has occured", e);
         }
     }
 }
